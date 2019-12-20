@@ -7,6 +7,8 @@ package it.polito.tdp.food;
 import java.net.URL;
 import java.util.ResourceBundle;
 import it.polito.tdp.food.model.Model;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -40,7 +42,7 @@ public class FoodController {
     private Button btnCammino; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxPorzioni"
-    private ComboBox<?> boxPorzioni; // Value injected by FXMLLoader
+    private ComboBox<String> boxPorzioni; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
@@ -49,12 +51,21 @@ public class FoodController {
     void doCammino(ActionEvent event) {
     	txtResult.clear();
     	txtResult.appendText("Cerco cammino peso massimo...");
+    	int passi=0;
+    	try {
+    		passi = Integer.parseInt(txtPassi.getText());
+    	}
+    	catch (NumberFormatException n) {
+    		txtResult.appendText("Inserisci un numero intero valido!");
+    	}
     }
 
     @FXML
     void doCorrelate(ActionEvent event) {
     	txtResult.clear();
     	txtResult.appendText("Cerco porzioni correlate...");
+    	String vertice = boxPorzioni.getValue();
+    	txtResult.appendText("Ecco le porzioni direttamente connesse : " + model.getConnessioni(vertice));
     	
     }
 
@@ -62,6 +73,18 @@ public class FoodController {
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
     	txtResult.appendText("Creazione grafo...");
+    	int n=0;
+    	try {
+    		 n = Integer.parseInt(txtCalorie.getText());
+    		 this.model.creaGrafo(n);
+    		 ObservableList<String> porzioni = FXCollections.observableList(model.getPorzioni(n));
+    			    	boxPorzioni.setItems(porzioni);
+    			    	boxPorzioni.setValue(porzioni.get(0));
+    	}
+    	catch(NumberFormatException nfe) {
+    		txtResult.appendText("Non hai inserito un numero intero!! Riprova");
+    	}
+    	
     	
     }
 
@@ -79,5 +102,6 @@ public class FoodController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	
     }
 }

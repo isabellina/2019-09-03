@@ -109,6 +109,56 @@ public class FoodDao {
 
 	}
 	
+	public List<String> tipiDiporzioni(int c){
+		String sql = "select distinct portion_display_name from portion where calories < ?" ;
+		try {
+			Connection conn = DBConnect.getConnection() ;
+
+			PreparedStatement st = conn.prepareStatement(sql) ;
+			
+			List<String> listaPorzioni = new ArrayList<String>() ;
+			st.setInt(1, c);
+			ResultSet res = st.executeQuery() ;
+			
+			while(res.next()) {
+				listaPorzioni.add(res.getString("portion_display_name"));
+			}
+			conn.close();
+			return listaPorzioni;
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
 	
+	public int getPeso(String s1, String s2) {
+		int p = -1;
+		String sql="select count(*) as total from (select * from portion where portion.portion_display_name = ?) t1\n" + 
+				"inner join (select * from portion where portion.portion_display_name = ?) t2\n" + 
+				"on t1.food_code = t2.food_code;" ;
+		
+		try {
+			Connection conn = DBConnect.getConnection() ;
+
+			PreparedStatement st = conn.prepareStatement(sql) ;
+			st.setString(1, s1);
+			st.setString(2, s2);
+			ResultSet res = st.executeQuery() ;
+			if(res.next()) {
+				p= res.getInt("total");
+			}
+			
+			conn.close();
+			
+			
+		}
+		
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return p;
+	}
 
 }
