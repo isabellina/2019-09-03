@@ -54,9 +54,11 @@ public class FoodController {
     	int passi=0;
     	try {
     		passi = Integer.parseInt(txtPassi.getText());
+    		txtResult.appendText("Ecco il cammino di peso massimo : " + this.model.recursive(passi, this.boxPorzioni.getValue()) + this.model.getPesoMassimo());
     	}
     	catch (NumberFormatException n) {
     		txtResult.appendText("Inserisci un numero intero valido!");
+    		return;
     	}
     }
 
