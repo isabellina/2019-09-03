@@ -17,9 +17,6 @@ public class Model {
 	private Graph grafo;
 	private List<String> listaFinale = new LinkedList<String>();
 	private int pesoMassimo = -1;
-	private int pesoParziale = 0;
-	private List<String> listaParziale = new LinkedList<String>();
-	
 	
 	
 	public Model  () {
@@ -73,43 +70,40 @@ public class Model {
 		return res;
 	}
 	
-	private boolean run(int n, int livelli, String sourceVertex, List<String> parziale) {
+	private List<String> run(int n, int livelli, String sourceVertex, List<String> parziale, int pesoParziale) {
 		if(livelli >= n) {
-			System.out.println("livelli: " + livelli + " n: " + n);
-			System.out.println("parziale alla fine: " + parziale);
-			if(this.pesoMassimo<=this.pesoParziale) {
-				this.listaFinale = parziale;
-				this.pesoMassimo = this.pesoParziale;
+			if(this.pesoMassimo <= pesoParziale) {
+				System.out.println("parziale alla fine: " + parziale);
+				this.listaFinale = new LinkedList<String>(parziale);
+				this.pesoMassimo = pesoParziale;
 			}
-			this.pesoParziale = 0;
-			
-			return true;
+			return this.listaFinale;
 		}
-		else {
-			parziale.add((String) sourceVertex);
-			List<String> p = new LinkedList<String>(parziale);
-			for(Object o:  Graphs.neighborListOf(this.grafo, sourceVertex)){
-				if(!parziale.contains((String)o)) {
-					p.add((String) o);
-					System.out.println("p nel for: " + p);
-					System.out.println("Peso calcolato: " + this.getWeight(sourceVertex, (String) o));
-					this.pesoParziale += this.getWeight(sourceVertex, (String) o);
-					this.run(n, livelli+1, (String) o, p);
-					p.remove(o);
+		else {			
+			for(Object o : Graphs.neighborListOf(this.grafo, sourceVertex)) {
+				if(!parziale.contains((String) o)) {
+					parziale.add((String) o);
+					
+					System.out.println("Peso da sommare: " + this.getWeight(sourceVertex, (String) o));
+					
+					this.run(n, livelli + 1, (String) o, parziale, pesoParziale + this.getWeight(sourceVertex, (String) o));
+					
+					parziale.remove(o);
 				}
 			}
 		}
-		return false;
+		return this.listaFinale;
 	}
+	
+
 	
 	public List<String> recursive(int n, String verticeP){
 		List<String> l = new LinkedList<String>();
-		if(this.run(n, 1, verticeP, l)) {
-			return this.listaFinale;
-		}
-		else {
-			return this.listaFinale;
-		}
+		l.add(verticeP);
+		List<String> ret = this.run(n, 1, verticeP, l, 0);
+		System.out.println("Mi arriva: " + ret);
+		
+		return ret;
 	}
 	
 	public List<String> getListaFinale(){
@@ -117,7 +111,9 @@ public class Model {
 	}
 	
 	public int getPesoMassimo() {
-		return this.pesoMassimo;
+		int peso = this.pesoMassimo;
+		this.pesoMassimo = 0;
+		return peso;
 	}
 	
 	
